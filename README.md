@@ -41,17 +41,7 @@ Public demos (UDIAT, HC18, CCA) live in `demo/`. Without a mask or box, a full-i
 
 ## Train
 
-- freeze image encoder; train mask decoder, D2U, and Uncertainty Transformer
-- random seed **42**
-- batch size 1
-- AdamW $5\times 10^{-5}$, $\beta=(0.9,0.999)$, $\varepsilon=10^{-8}$, weight decay $0.01$
-- ReduceLROnPlateau: factor $0.9$, patience 10 evaluations, min $10^{-6}$
-- **training loss evaluated every 500 iterations**
-- DTS $N=20$, central tokens $K=3$, contrastive margin $\tau=0$
-- augmentation: scale $0.75$–$1.25$, rotation $\pm 45^\circ$, gamma $0.5$–$1.5$, brightness $\pm 0.1$, Gaussian noise $0.01$–$0.2$, each $p=0.5$
-- train box jitter up to 10 px
-
-The paper **does not specify** a total iteration count or gradient clipping. Use `--max-iters` only if you want an engineering stop; otherwise training continues until you interrupt it, with checkpoints written every 500 iterations.
+Use `--max-iters` only if you want an engineering stop; otherwise training continues until you interrupt it, with checkpoints written every 500 iterations.
 
 ```bash
 python train.py \
