@@ -1,8 +1,8 @@
 # ETU-SAM
 
-**Efficient and Transparent Uncertainty Estimation for Segment Anything Model**
+**ETU-SAM: Efficient and Transparent Uncertainty Estimation for Segment Anything Model in Ultrasound Segmentation**
 
-Official PyTorch implementation of the method in §3.
+Official PyTorch implementation of ETU-SAM.
 
 Repository: https://github.com/binhuang15/ETU-SAM
 
@@ -41,8 +41,6 @@ Public demos (UDIAT, HC18, CCA) live in `demo/`. Without a mask or box, a full-i
 
 ## Train
 
-Matches **§3.3**:
-
 - freeze image encoder; train mask decoder, D2U, and Uncertainty Transformer
 - random seed **42**
 - batch size 1
@@ -55,12 +53,6 @@ Matches **§3.3**:
 
 The paper **does not specify** a total iteration count or gradient clipping. Use `--max-iters` only if you want an engineering stop; otherwise training continues until you interrupt it, with checkpoints written every 500 iterations.
 
-Eq. (11), all coefficients $=1$:
-
-$$
-\mathcal{L}=\mathcal{L}_{\mathrm{Dice}}+\mathcal{L}_{\mathrm{CE}}+\mathcal{L}_{\mathrm{contrast}}+\mathcal{L}_{\mathrm{ELBO}}+\mathcal{L}_{\mathrm{UnW}}+\mathcal{L}_{\mathrm{Corr}}
-$$
-
 ```bash
 python train.py \
   --data-root /path/to/SAMed2Dv1 \
@@ -71,35 +63,6 @@ python train.py \
 
 `--data-root` must contain `SAMed2D_v1.json`. The 16 ultrasound test sets are held out.
 
-## Method map (code ↔ paper)
-
-- **D2U** (UW-BML + DTS) → `D2UMaskDecoder`
-- Central tokens $T_c$, $K=3$ → `D2UMaskDecoder.central_tokens` (checkpoint key: `mid_tokens`)
-- DTS $T_x=\mu+\sigma\odot\tanh(\epsilon)$, $N=20$ → `D2UMaskDecoder.dts`
-- Prompt Encoder → `PromptEncoder`
-- Uncertainty Transformer → `PromptEncoder.uncertainty_transformer` (Stages 2–3)
-- $U_{\mathrm{map}}$ Eq. (3), $U$ Eq. (4) → `etu_sam.losses.uncertainty_map`
-- $\mathcal{L}_{\mathrm{contrast}}$ Eq. (5), $\tau=0$, $y=-1$ → `contrast_loss`
-- $\mathcal{L}_{\mathrm{ELBO}}$ Eq. (6)–(7), prior $\mathcal{N}(0,1)$ → `elbo_loss`
-- $\mathcal{L}_{\mathrm{UnW}}$ Eq. (8) → `unw_loss`
-- $\mathcal{L}_{\mathrm{Corr}}$ Eq. (9) → `corr_loss` (Pearson+cos over the current 500-iter window; batch size is 1)
-- Eq. (11) → `total_loss`
-- Two-pass inference → `forward_etu`
-
-Checkpoint parameter names (`mid_tokens`, `transformer2`, `mu_var_*`, …) are left as trained so `checkpoints/ETU-SAM.pt` still loads strictly.
-
 ## License
 
 MIT. `segment_anything/` is adapted from [SAM](https://github.com/facebookresearch/segment-anything) and [SAM-Med2D](https://github.com/OpenGVLab/SAM-Med2D) (Apache 2.0).
-
-## Layout
-
-```
-ETU-SAM/
-  infer.py
-  train.py
-  demo/
-  etu_sam/
-  segment_anything/
-  checkpoints/ETU-SAM.pt
-```
