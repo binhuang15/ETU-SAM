@@ -1,0 +1,9 @@
+# ETU-SAM
+__pycache__/
+*.pyc
+.Python
+.venv/
+venv/
+outputs/
+*.egg-info/
+.DS_Store
